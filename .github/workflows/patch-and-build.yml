@@ -13,9 +13,14 @@ jobs:
       - name: Pull the patch file from repo
         uses: actions/checkout@v2
         
+      - name: Get latest release tag
+        run: |
+          RELEASE_TAG=`curl -fsS https://api.github.com/repos/acidanthera/WhateverGreen/releases/latest | python3 -c 'import sys, json; print(json.load(sys.stdin)[\'tag_name\']);'`
+          echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
+          echo "WEG_WORKING_DIR=WhateverGreen-$RELEASE_TAG" >> $GITHUB_ENV
+        
       - name: Fetch the latest source code from the releases
         run: |
-          RELEASE_TAG=`curl -fsS https://api.github.com/repos/acidanthera/WhateverGreen/releases/latest | python3 -c "import sys, json; print(json.load(sys.stdin)['tag_name']);"`
           curl -fsSL https://github.com/acidanthera/WhateverGreen/archive/refs/tags/${RELEASE_TAG}.tar.gz | tar -xzf -
           pwd && ls -alF
           
@@ -35,10 +40,12 @@ jobs:
         run: |
           src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/acidanthera/Lilu/master/Lilu/Scripts/bootstrap.sh) && eval "$src" || exit 1
       - run: xcodebuild -jobs 1 -configuration Debug
+        working-directory: ${{ env.WEG_WORKING_DIR }}
       - run: xcodebuild -jobs 1 -configuration Release
+        working-directory: ${{ env.WEG_WORKING_DIR }}
       
       - name: Move files around
-        run: mv -v build/*/*.zip $DIST_DIR/
+        run: mv -v $WEG_WORKING_DIR/build/*/*.zip $DIST_DIR/
         
       - name: Commit resulting files to this repo
         run: |
