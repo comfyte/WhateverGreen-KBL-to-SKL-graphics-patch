@@ -15,7 +15,7 @@ jobs:
         
       - name: Get latest release tag
         run: |
-          RELEASE_TAG=`curl -fsS https://api.github.com/repos/acidanthera/WhateverGreen/releases/latest | python3 -c 'import sys, json; print(json.load(sys.stdin)[\'tag_name\']);'`
+          RELEASE_TAG=`curl -fsS https://api.github.com/repos/acidanthera/WhateverGreen/releases/latest | python3 -c "import sys, json; print(json.load(sys.stdin)['tag_name']);"`
           echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
           echo "WEG_WORKING_DIR=WhateverGreen-$RELEASE_TAG" >> $GITHUB_ENV
         
