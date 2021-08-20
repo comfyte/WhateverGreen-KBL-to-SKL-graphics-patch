@@ -8,6 +8,7 @@ jobs:
     
     env:
       PROJECT_TYPE: KEXT
+      JOB_TYPE: BUILD
       DIST_DIR: dist
 
     steps:
