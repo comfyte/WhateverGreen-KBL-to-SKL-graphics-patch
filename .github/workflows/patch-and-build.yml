@@ -17,7 +17,7 @@ jobs:
       - name: Fetch the latest source code from the releases
         run: |
           RELEASE_TAG=`curl -fsS https://api.github.com/repos/acidanthera/WhateverGreen/releases/latest | python3 -c "import sys, json; print(json.load(sys.stdin)['tag_name']);"`
-          curl -fsS https://github.com/acidanthera/WhateverGreen/archive/refs/tags/${RELEASE_TAG}.tar.gz | tar -xzf
+          curl -fsS https://github.com/acidanthera/WhateverGreen/archive/refs/tags/${RELEASE_TAG}.tar.gz | tar -xzf -
           
       - name: Apply patch
         run: patch WhateverGreen/kern_igfx.cpp add_skl_graphics.patch
