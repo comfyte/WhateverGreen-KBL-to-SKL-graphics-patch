@@ -1,0 +1,2 @@
+114a115
+> 			currentFramebufferOpt = &kextIntelSKLFb; // Add support for skylake IDs
