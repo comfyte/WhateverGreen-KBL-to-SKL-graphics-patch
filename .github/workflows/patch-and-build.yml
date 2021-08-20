@@ -1,0 +1,46 @@
+name: Patch and Build WEG
+
+on: workflow_dispatch
+
+jobs:
+  main-job:
+    runs-on: macos-latest
+    
+    env:
+      DIST_DIR: dist
+      TZ: Asia/Jakarta
+
+    steps:
+      - name: Pull the patch file from repo
+        uses: actions/checkout@v2
+        
+      - name: Fetch the latest source code from the releases
+        run: |
+          $RELEASE_TAG=`curl -fsS https://api.github.com/repos/acidanthera/WhateverGreen/releases/latest | python3 -c "import sys, json; print(json.load(sys.stdin)['tag_name']);"`
+          curl -fsS https://github.com/acidanthera/WhateverGreen/archive/refs/tags/${RELEASE_TAG}.tar.gz | tar -xzf
+
+      # Original workflow steps courtesy of Acidanthera
+      # https://github.com/acidanthera/WhateverGreen/blob/master/.github/workflows/main.yml
+      - uses: actions/checkout@v2
+        with:
+          repository: acidanthera/MacKernelSDK
+          path: MacKernelSDK
+      - name: CI Bootstrap
+        run: |
+          src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/acidanthera/ocbuild/master/ci-bootstrap.sh) && eval "$src" || exit 1
+      - name: Lilu Bootstrap
+        run: |
+          src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/acidanthera/Lilu/master/Lilu/Scripts/bootstrap.sh) && eval "$src" || exit 1
+      - run: xcodebuild -jobs 1 -configuration Debug
+      - run: xcodebuild -jobs 1 -configuration Release
+      
+      - name: Move files around
+        run: mv -v build/*/*.zip $DIST_DIR/
+        
+      - name: Commit resulting files to this repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dist
+          git commit -m "Build at `date`"
+          git push
