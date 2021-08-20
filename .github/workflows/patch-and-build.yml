@@ -52,7 +52,7 @@ jobs:
       # End of original build steps
       
       - name: Move files around
-        run: mkdir $DIST_DIR && mv -v $WEG_WORKING_DIR/build/*/*.zip $DIST_DIR/
+        run: mkdir -p $DIST_DIR && mv -v $WEG_WORKING_DIR/build/*/*.zip $DIST_DIR/
         
       - name: Commit resulting files to this repo
         run: |
