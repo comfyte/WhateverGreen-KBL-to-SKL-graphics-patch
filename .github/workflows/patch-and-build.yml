@@ -27,7 +27,7 @@ jobs:
           pwd && ls -alF
           
       - name: Apply patch
-        run: patch $WEG_WORKING_DIR/WhateverGreen/kern_igfx.cpp add_skl_graphics.patch
+        run: patch --verbose $WEG_WORKING_DIR/WhateverGreen/kern_igfx.cpp add_skl_graphics.patch
 
       # Original workflow steps courtesy of Acidanthera
       # https://github.com/acidanthera/WhateverGreen/blob/master/.github/workflows/main.yml
