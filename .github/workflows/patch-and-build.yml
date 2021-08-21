@@ -1,6 +1,11 @@
 name: Patch and Build WEG
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      release-tag:
+        description: Enter a specific WhateverGreen release version
+        required: false
 
 jobs:
   main-job:
@@ -15,21 +20,23 @@ jobs:
       - name: Pull the patch file from repo
         uses: actions/checkout@v2
         
-      - name: Get latest release tag
+      - name: Get release tag
+        env:
+          RELEASE_TAG: ${{ github.event.inputs.release-tag }}
         run: |
-          RELEASE_TAG=`curl -fsS https://api.github.com/repos/acidanthera/WhateverGreen/releases/latest | python3 -c "import sys, json; print(json.load(sys.stdin)['tag_name']);"`
+          if ! echo $RELEASE_TAG | grep -E "\d\.\d\.\d"; then
+            RELEASE_TAG=`curl -fsS https://api.github.com/repos/acidanthera/WhateverGreen/releases/latest | python3 -c "import sys, json; print(json.load(sys.stdin)['tag_name']);"`
+          fi
           echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
           echo "WEG_WORKING_DIR=WhateverGreen-$RELEASE_TAG" >> $GITHUB_ENV
         
       - name: Fetch the latest source code from the releases
-        run: |
-          curl -fsSL https://github.com/acidanthera/WhateverGreen/archive/refs/tags/${RELEASE_TAG}.tar.gz | tar -xzf -
-          pwd && ls -alF
+        run: curl -fsSL https://github.com/acidanthera/WhateverGreen/archive/refs/tags/${RELEASE_TAG}.tar.gz | tar -xzf -
           
       - name: Apply patch
-        run: patch --verbose $WEG_WORKING_DIR/WhateverGreen/kern_igfx.cpp add_skl_graphics.patch
+        run: patch --verbose $WEG_WORKING_DIR/WhateverGreen/kern_igfx.cpp add-skl-graphics.patch
 
-      # Original workflow steps courtesy of Acidanthera
+      # Original workflow steps credits to Acidanthera
       # https://github.com/acidanthera/WhateverGreen/blob/master/.github/workflows/main.yml
       - uses: actions/checkout@v2
         with:
@@ -38,11 +45,9 @@ jobs:
           
       - name: CI Bootstrap
         run: src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/acidanthera/ocbuild/master/ci-bootstrap.sh) && eval "$src" || exit 1
-        working-directory: ${{ env.WEG_WORKING_DIR }}
         
       - name: Lilu Bootstrap
         run: src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/acidanthera/Lilu/master/Lilu/Scripts/bootstrap.sh) && eval "$src" || exit 1
-        working-directory: ${{ env.WEG_WORKING_DIR }}
         
       - run: xcodebuild -jobs 1 -configuration Debug
         working-directory: ${{ env.WEG_WORKING_DIR }}
@@ -55,11 +60,17 @@ jobs:
         run: mkdir -p $DIST_DIR && mv -v $WEG_WORKING_DIR/build/*/*.zip $DIST_DIR/
         
       - name: Commit resulting files to this repo
+        env:
+          TZ: Asia/Jakarta
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add $DIST_DIR
           git commit -m "Build at `date`"
           git push
-        env:
-          TZ: Asia/Jakarta
+
+      - name: Upload artifacts for examining
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifact
+          path: .
