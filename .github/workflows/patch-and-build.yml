@@ -48,6 +48,7 @@ jobs:
         
       - name: Lilu Bootstrap
         run: src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/acidanthera/Lilu/master/Lilu/Scripts/bootstrap.sh) && eval "$src" || exit 1
+        working-directory: ${{ env.WEG_WORKING_DIR }}
         
       - run: xcodebuild -jobs 1 -configuration Debug
         working-directory: ${{ env.WEG_WORKING_DIR }}
