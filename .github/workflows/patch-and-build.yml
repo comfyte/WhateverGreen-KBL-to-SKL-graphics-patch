@@ -74,4 +74,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: build-artifact
-          path: .
+          path: ${{ env.WEG_WORKING_DIR }}
