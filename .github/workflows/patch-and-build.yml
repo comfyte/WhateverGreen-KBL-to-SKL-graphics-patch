@@ -73,5 +73,5 @@ jobs:
       - name: Upload artifacts for examining
         uses: actions/upload-artifact@v2
         with:
-          name: build-artifact
+          name: build-artifact-${{ env.RELEASE_TAG }}
           path: ${{ env.WEG_WORKING_DIR }}
