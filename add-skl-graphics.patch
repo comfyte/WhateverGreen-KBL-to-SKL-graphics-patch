@@ -1,5 +1,6 @@
-114c114,115
+113,114c113,114
+< 			currentGraphics = &kextIntelKBL;
 < 			currentFramebuffer = &kextIntelKBLFb;
 ---
-> 			currentFramebuffer = &kextIntelKBLFb; // Preserve kabylake IDs in case we still need it
-> 			currentFramebufferOpt = &kextIntelSKLFb; // Add support for skylake IDs
+> 			currentGraphics = &kextIntelSKL;
+> 			currentFramebuffer = &kextIntelSKLFb;
