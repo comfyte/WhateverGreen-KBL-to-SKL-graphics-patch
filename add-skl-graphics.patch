@@ -1,6 +1,8 @@
-113,114c113,114
+113,115c113,115
 < 			currentGraphics = &kextIntelKBL;
 < 			currentFramebuffer = &kextIntelKBLFb;
+< 			modForceCompleteModeset.supported = modForceCompleteModeset.enabled = true;
 ---
 > 			currentGraphics = &kextIntelSKL;
 > 			currentFramebuffer = &kextIntelSKLFb;
+> 			modForceCompleteModeset.supported = modForceCompleteModeset.legacy = modForceCompleteModeset.enabled = true;
